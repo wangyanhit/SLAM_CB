@@ -26,14 +26,20 @@ def find_cylinders(scan, scan_derivative, jump, min_dist):
     sum_ray, sum_depth, rays = 0.0, 0.0, 0
 
     for i in xrange(len(scan_derivative)):
-        # --->>> Insert your cylinder code here.
-        # Whenever you find a cylinder, add a tuple
-        # (average_ray, average_depth) to the cylinder_list.
+        if scan_derivative[i] < -jump and scan[i] > min_dist:
+            sum_ray, sum_depth, rays = 0.0, 0.0, 0
+            on_cylinder = True
 
-        # Just for fun, I'll output some cylinders.
-        # Replace this by your code.
-        if i % 100 == 0:
-            cylinder_list.append( (i, scan[i]) )
+        if on_cylinder is True:
+            sum_ray += i
+            sum_depth += scan[i]
+            rays += 1
+
+            if scan_derivative[i] > jump and scan[i] > min_dist:
+                on_cylinder = False
+                average_depth = sum_depth / rays
+                average_ray = sum_ray / rays
+                cylinder_list.append((average_ray, average_depth))
 
     return cylinder_list
 
@@ -54,7 +60,7 @@ if __name__ == '__main__':
     der = compute_derivative(scan, minimum_valid_distance)
     cylinders = find_cylinders(scan, der, depth_jump,
                                minimum_valid_distance)
-
+    print cylinders
     # Plot results.
     plot(scan)
     scatter([c[0] for c in cylinders], [c[1] for c in cylinders],

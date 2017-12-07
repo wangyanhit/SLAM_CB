@@ -10,8 +10,11 @@ def compute_derivative(scan, min_dist):
     for i in xrange(1, len(scan) - 1):
         # --->>> Insert your code here.
         # Compute derivative using formula "(f(i+1) - f(i-1)) / 2".
-        # Do not use erroneous scan values, which are below min_dist.
-        jumps.append(i%20 * 10) # Replace this line, append derivative instead.
+        l, r = scan[i - 1], scan[i + 1]
+        if l > min_dist and r > min_dist:
+            jumps.append((r - l) / 2)
+        else:
+            jumps.append(0)
 
     jumps.append(0)
     return jumps

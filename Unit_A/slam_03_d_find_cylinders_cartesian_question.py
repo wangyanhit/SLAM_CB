@@ -27,7 +27,21 @@ def find_cylinders(scan, scan_derivative, jump, min_dist):
     on_cylinder = False
     sum_ray, sum_depth, rays = 0.0, 0.0, 0
 
-    # --->>> Insert here your previous solution from find_cylinders_question.py.
+    for i in xrange(len(scan_derivative)):
+        if scan_derivative[i] < -jump and scan[i] > min_dist:
+            sum_ray, sum_depth, rays = 0.0, 0.0, 0
+            on_cylinder = True
+
+        if on_cylinder is True:
+            sum_ray += i
+            sum_depth += scan[i]
+            rays += 1
+
+            if scan_derivative[i] > jump and scan[i] > min_dist:
+                on_cylinder = False
+                average_depth = sum_depth / rays
+                average_ray = sum_ray / rays
+                cylinder_list.append((average_ray, average_depth))
 
     return cylinder_list
 
@@ -35,10 +49,13 @@ def compute_cartesian_coordinates(cylinders, cylinder_offset):
     result = []
     for c in cylinders:
         # --->>> Insert here the conversion from polar to Cartesian coordinates.
+        beam_index, range = c
+        angle = LegoLogfile.beam_index_to_angle(beam_index)
+        fixed_range = range + cylinder_offset
         # c is a tuple (beam_index, range).
         # For converting the beam index to an angle, use
         # LegoLogfile.beam_index_to_angle(beam_index)
-        result.append( (0,0) ) # Replace this by your (x,y)
+        result.append((cos(angle) * fixed_range, sin(angle) * fixed_range)) # Replace this by your (x,y)
     return result
         
 
@@ -65,6 +82,7 @@ if __name__ == '__main__':
                                    minimum_valid_distance)
         cartesian_cylinders = compute_cartesian_coordinates(cylinders,
                                                             cylinder_offset)
+
         # Write to file.
         print >> out_file, "D C",
         for c in cartesian_cylinders:
