@@ -20,7 +20,17 @@ def find_cylinder_pairs(cylinders, reference_cylinders, max_radius):
     # In the loop, if cylinders[i] is closest to reference_cylinders[j],
     # and their distance is below max_radius, then add the
     # tuple (i,j) to cylinder_pairs, i.e., cylinder_pairs.append( (i,j) ).
-
+    for i in range(len(cylinders)):
+        c_x, c_y = cylinders[i]
+        min_j = 0
+        min_dis = (c_x - reference_cylinders[0][0])**2 + (c_y - reference_cylinders[0][1])**2
+        for j in range(len(reference_cylinders)):
+            dis = (c_x - reference_cylinders[j][0])**2 + (c_y - reference_cylinders[j][1])**2
+            if dis < min_dis:
+                min_j = j
+                min_dis = dis
+        if min_dis < max_radius**2:
+            cylinder_pairs.append((i, min_j))
     return cylinder_pairs
 
 
