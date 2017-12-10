@@ -30,6 +30,7 @@ class ExtendedKalmanFilter:
     def dg_dstate(state, control, w):
         theta = state[2]
         l, r = control
+
         if r != l:
 
             # --->>> Put your code here.
@@ -40,13 +41,18 @@ class ExtendedKalmanFilter:
             # use: m = array([[1, 2, 3], [4, 5, 6], [7, 8, 9]]),
             # where 1, 2, 3 are the values of the first row of the matrix.
             # Don't forget to return this matrix.
-            m = array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])  # Replace this.
-
+            alpha = (r - l) / w
+            rad = l / alpha
+            m = array([[1, 0, (rad + w / 2) * (cos(theta + alpha) - cos(theta))],
+                       [0, 1, (rad + w / 2) * (sin(theta + alpha) - sin(theta))],
+                       [0, 0, 1]])
         else:
 
             # --->>> Put your code here.
             # This is for the special case r == l.
-            m = array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])  # Replace this.
+            m = array([[1, 0, -l * sin(theta)],
+                       [0, 1, l * cos(theta)],
+                       [0, 0, 1]])
 
         return m
 

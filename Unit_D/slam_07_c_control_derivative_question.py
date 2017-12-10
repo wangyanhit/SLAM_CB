@@ -31,21 +31,29 @@ class ExtendedKalmanFilter:
         theta = state[2]
         l, r = tuple(control)
         if r != l:
-
+            alpha = (r - l) / w
+            rad = l / alpha
+            theta_p = theta + alpha
             # --->>> Put your code here.
             # This is for the case l != r.
             # Note g has 3 components and control has 2, so the result
             # will be a 3x2 (rows x columns) matrix.
-            pass  # Remove this.
+            m = array([[w * r / (r - l)**2 * (sin(theta_p) - sin(theta)) - (r + l) / 2 / (r - l) * cos(theta_p),
+                        -w * l / (r - l) ** 2 * (sin(theta_p) - sin(theta)) + (r + l) / 2 / (r - l) * cos(theta_p)],
+                       [w * r / (r - l)**2 * (-cos(theta_p) + cos(theta)) - (r + l) / 2 / (r - l) * sin(theta_p),
+                        -w * l / (r - l) ** 2 * (-cos(theta_p) + cos(theta)) + (r + l) / 2 / (r - l) * sin(theta_p)],
+                       [-1 / w,
+                        1 / w]])
             
             
         else:
 
             # --->>> Put your code here.
             # This is for the special case l == r.
-            pass  # Remove this.            
 
-        m = array([[1, 2], [3, 4], [5, 6]])  # Remove this.
+            m = array([[1 / 2 * (cos(theta) + l / w * sin(theta)), 1 / 2 * (sin(theta) - l / w * cos(theta))],
+                       [1 / 2 * (-l / w * sin(theta) + cos(theta)), 1 / 2 * (l / w * cos(theta) + sin(theta))],
+                       [-1 / w, 1 / w]])  # Remove this.
             
         return m
 

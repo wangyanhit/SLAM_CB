@@ -39,17 +39,64 @@ class ExtendedKalmanFilter:
 
     @staticmethod
     def dg_dstate(state, control, w):
+        theta = state[2]
+        l, r = control
 
-        # --->>> Copy your previous dg_dstate code here.
+        if r != l:
 
-        return array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+            # --->>> Put your code here.
+            # This is for the case r != l.
+            # g has 3 components and the state has 3 components, so the
+            # derivative of g with respect to all state variables is a
+            # 3x3 matrix. To construct such a matrix in Python/Numpy,
+            # use: m = array([[1, 2, 3], [4, 5, 6], [7, 8, 9]]),
+            # where 1, 2, 3 are the values of the first row of the matrix.
+            # Don't forget to return this matrix.
+            alpha = (r - l) / w
+            rad = l / alpha
+            m = array([[1, 0, (rad + w / 2) * (cos(theta + alpha) - cos(theta))],
+                       [0, 1, (rad + w / 2) * (sin(theta + alpha) - sin(theta))],
+                       [0, 0, 1]])
+        else:
+
+            # --->>> Put your code here.
+            # This is for the special case r == l.
+            m = array([[1, 0, -l * sin(theta)],
+                       [0, 1, l * cos(theta)],
+                       [0, 0, 1]])
+
+        return m
 
     @staticmethod
     def dg_dcontrol(state, control, w):
+        theta = state[2]
+        l, r = tuple(control)
+        if r != l:
+            alpha = (r - l) / w
+            rad = l / alpha
+            theta_p = theta + alpha
+            # --->>> Put your code here.
+            # This is for the case l != r.
+            # Note g has 3 components and control has 2, so the result
+            # will be a 3x2 (rows x columns) matrix.
+            m = array([[w * r / (r - l) ** 2 * (sin(theta_p) - sin(theta)) - (r + l) / 2 / (r - l) * cos(theta_p),
+                        -w * l / (r - l) ** 2 * (sin(theta_p) - sin(theta)) + (r + l) / 2 / (r - l) * cos(theta_p)],
+                       [w * r / (r - l) ** 2 * (-cos(theta_p) + cos(theta)) - (r + l) / 2 / (r - l) * sin(theta_p),
+                        -w * l / (r - l) ** 2 * (-cos(theta_p) + cos(theta)) + (r + l) / 2 / (r - l) * sin(theta_p)],
+                       [-1 / w,
+                        1 / w]])
 
-        # --->>> Copy your previous dg_dcontrol code here.
-            
-        return array([[1, 2], [3, 4], [5, 6]])
+
+        else:
+
+            # --->>> Put your code here.
+            # This is for the special case l == r.
+
+            m = array([[1 / 2 * (cos(theta) + l / w * sin(theta)), 1 / 2 * (sin(theta) - l / w * cos(theta))],
+                       [1 / 2 * (-l / w * sin(theta) + cos(theta)), 1 / 2 * (l / w * cos(theta) + sin(theta))],
+                       [-1 / w, 1 / w]])  # Remove this.
+
+        return m
 
     @staticmethod
     def get_error_ellipse(covariance):
@@ -80,8 +127,15 @@ class ExtendedKalmanFilter:
         # and the matrix product of A and B is written as dot(A, B).
         # Writing A*B instead will give you the element-wise product, which
         # is not intended here.
+        G = self.dg_dstate(self.state, control, self.robot_width)
+        V = self.dg_dcontrol(self.state, control, self.robot_width)
+        sigmal2 = (self.control_motion_factor * left)**2 + (self.control_turn_factor * (left - right))**2
+        sigmar2 = (self.control_motion_factor * right) ** 2 + (self.control_turn_factor * (left - right)) ** 2
+        print V,
+        R = (V.dot(diag([sigmal2, sigmar2]))).dot(V.transpose())
 
-        # state' = g(state, control)
+        self.state = self.g(self.state, control, self.robot_width)
+        self.covariance = (G.dot(self.covariance)).dot(G.transpose()) + R
 
         # --->>> Put your code to compute the new self.state here.
 
