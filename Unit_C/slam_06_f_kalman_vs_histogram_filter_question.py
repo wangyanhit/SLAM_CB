@@ -56,10 +56,13 @@ def kalman_filter_step(belief, control, measurement):
     # --->>> Put your code here.
     
     # Prediction.
-    prediction = Density(belief.mu + 10.0, belief.sigma2 + 100.0)  # Replace
+    prediction = Density(belief.mu + control.mu, belief.sigma2 + control.sigma2)  # Replace
 
     # Correction.
-    correction = prediction  # Replace
+    k = prediction.sigma2 / (prediction.sigma2 + measurement.sigma2)
+    mu = prediction.mu + k * (measurement.mu - prediction.mu)
+    sigma2 = (1 - k) * prediction.sigma2
+    correction = Density(mu, sigma2)
 
     return (prediction, correction)
 

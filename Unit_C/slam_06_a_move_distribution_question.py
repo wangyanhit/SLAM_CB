@@ -9,7 +9,7 @@ def move(distribution, delta):
        delta."""
 
     # --->>> Insert your code here.
-    
+    distribution.offset += delta
     return distribution  # Replace this by your own result.
 
 if __name__ == '__main__':

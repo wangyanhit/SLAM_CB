@@ -8,8 +8,22 @@ def multiply(a, b):
     """Multiply two distributions and return the resulting distribution."""
 
     # --->>> Put your code here.
-    
-    return a  # Modify this to return your result.
+    if a.offset < b.offset:
+        offset = a.offset
+    else:
+        offset = b.offset
+
+    if a.offset + len(a.values) > b.offset + len(b.values):
+        stop = a.offset + len(a.values) - 1
+    else:
+        stop = b.offset + len(b.values) - 1
+    values = [0] * (stop - offset + 1)
+    for i in range(offset, stop + 1):
+        values[i - offset] += a.value(i) * b.value(i)
+
+    post = Distribution(offset, values)
+    post.normalize()
+    return post  # Modify this to return your result.
 
 
 if __name__ == '__main__':

@@ -13,15 +13,21 @@ def convolve(a, b):
     """Convolve distribution a and b and return the resulting new distribution."""
 
     # --->>> Put your code here.
-    
-    return a  # Replace this by your own result.
+    offset = a.start() + b.start()
+    values = [0] * (len(a.values) + len(b.values) - 1)
+
+    for i in range(len(a.values)):
+        for j in range(len(b.values)):
+            values[i + j] += a.values[i] * b.values[j]
+    print values
+    return Distribution(offset, values)
 
 
 if __name__ == '__main__':
-    arena = (0,100)
+    arena = (0,1000)
 
     # Move 3 times by 20.
-    moves = [20] * 3
+    moves = [20] * 50
 
     # Start with a known position: probability 1.0 at position 10.
     position = Distribution.unit_pulse(10)
