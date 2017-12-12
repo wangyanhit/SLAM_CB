@@ -25,7 +25,7 @@ class ExtendedKalmanFilterSLAM:
 
     @staticmethod
     def g(state, control, w):
-        x, y, theta = state
+        x, y, theta = state[0:3]
         l, r = control
         if r != l:
             alpha = (r - l) / w
@@ -37,8 +37,8 @@ class ExtendedKalmanFilterSLAM:
             g1 = x + l * cos(theta)
             g2 = y + l * sin(theta)
             g3 = theta
-
-        return array([g1, g2, g3])
+        state[0:3] = array([g1, g2, g3])
+        return state
 
     @staticmethod
     def dg_dstate(state, control, w):
@@ -112,7 +112,15 @@ class ExtendedKalmanFilterSLAM:
 
         # Now enlarge G3 and R3 to accomodate all landmarks. Then, compute the
         # new covariance matrix self.covariance.
-        self.covariance = dot(G3, dot(self.covariance, G3.T)) + R3  # Replace this.
+        G_ur = zeros((3, 2 * self.number_of_landmarks))
+        G_dl = G_ur.transpose()
+        G_dr = eye(2 * self.number_of_landmarks)
+        G = concatenate((concatenate((G3, G_ur), axis=1), concatenate((G_dl, G_dr), axis=1)), axis=0)
+
+        R_dr = zeros((2 * self.number_of_landmarks, 2 * self.number_of_landmarks))
+        R = concatenate((concatenate((R3, G_ur), axis=1), concatenate((G_dl, R_dr), axis=1)), axis=0)
+
+        self.covariance = dot(G, dot(self.covariance, G.T)) + R  # Replace this.
         # state' = g(state, control)
         self.state = self.g(self.state, control, self.robot_width)  # Replace this.
 
