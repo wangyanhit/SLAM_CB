@@ -66,7 +66,7 @@ def dijkstra(start, goal, obstacles):
     # The second element is the position (cell) of the point.
     # The third component is the position we came from when entering the tuple
     #   to the front.
-    front = [ (0.001, start) ]  # CHANGE 01_d: Add None to this tuple.
+    front = [(0.001, start, None)]  # CHANGE 01_d: Add None to this tuple.
 
     # In the beginning, no cell has been visited.
     extents = obstacles.shape
@@ -78,15 +78,17 @@ def dijkstra(start, goal, obstacles):
     # While there are elements to investigate in our front.
     while front:
         # Get smallest item and remove from front.
- 
+        min_cost_node = heappop(front)
         # Check if this has been visited already.
-        cost, pos, previous = element  # CHANGE 01_d: add 'previous' (as shown).
-
+        cost, pos, previous = min_cost_node  # CHANGE 01_d: add 'previous' (as shown).
+        if(visited[pos] > 0):
+            continue
         # Now it is visited. Mark with cost.
-
+        visited[pos] = cost
         # Also remember that we came from previous when we marked pos.
         # CHANGE 01_d: enter 'previous' (value) into the 'came_from' dictionary
         #   at index (key) 'pos'.
+        came_from[pos] = previous
 
         # Check if the goal has been reached.
         if pos == goal:
@@ -95,12 +97,17 @@ def dijkstra(start, goal, obstacles):
         # Check all neighbors.
         for dx, dy, deltacost in movements:
             # Determine new position and check bounds.
-
+            new_x = pos[0] + dx
+            new_y = pos[1] + dy
             # Add to front if: not visited before and no obstacle.
+            if(new_x < 0 or new_x >= extents[0] or new_y < 0 or new_y >= extents[1]):
+                continue
             new_pos = (new_x, new_y)
             # CHANGE 01_d: When push'ing the new tuple to the heap, make
             #   sure it is a 3-tuple, with the last component of the tuple
             #   being the position 'we came from' (which is 'pos').
+            if (not visited[new_pos] and obstacles[new_pos] != 255):
+                heappush(front, (cost + deltacost, new_pos, pos))
 
 
     # CHANGE 01_d: Make sure to include the following code, which 'unwinds'

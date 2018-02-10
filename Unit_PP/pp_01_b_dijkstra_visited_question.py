@@ -59,11 +59,11 @@ movements = [ # Direct neighbors (4N).
             ]
 
 def dijkstra(start, goal, obstacles):
-    """Dijkstra's algorithm, second versiion records cost in 'visited' array."""
+    """Dijkstra's algorithm. First version does not use a heap."""
     # In the beginning, the start is the only element in our front.
     # The first element is the cost of the path from the start to the point.
     # The second element is the position (cell) of the point.
-    front = [ (0.0, start) ]  # CHANGE 01_b: set the cost to e.g. 0.001
+    front = [ (0.001, start) ]
 
     # In the beginning, no cell has been visited.
     extents = obstacles.shape
@@ -72,23 +72,42 @@ def dijkstra(start, goal, obstacles):
     # While there are elements to investigate in our front.
     while front:
         # Get smallest item and remove it from front.
+        # - Get smallest element from 'front'. Hint: min() may be useful.
+        min_cost_node = min(front)
+        # - Remove this element from 'front'. Hint: 'front' is a list.
+        front.remove(min_cost_node)
 
-        # Check if this has been visited already.
-        cost, pos = element
+        # Check if this has been visited already. Skip the rest of the loop body if visited[pos] is > 0.
+        cost, pos = min_cost_node
+        if(visited[pos] > 0):
+            continue
 
-        # Now it is visited. Mark with cost.
-        # CHANGE 01_b: set visited[pos] to cost instead of 1.
+        # Now it is visited. Mark with 1.
+        visited[pos] = cost
 
         # Check if the goal has been reached.
         if pos == goal:
             break  # Finished!
 
+        new_x = None
+        new_y = None
         # Check all neighbors.
         for dx, dy, deltacost in movements:
             # Determine new position and check bounds.
+            # - Compute new_x and new_y from old position 'pos' and dx, dy.
+            new_x = pos[0] + dx
+            new_y = pos[1] + dy
+            # - Check that new_x is >= 0 and < extents[0], similarly for new_y.
+            # - If not, skip the remaining part of this loop.
+            if(new_x < 0 or new_x >= extents[0] or new_y < 0 or new_y >= extents[1]):
+                continue
 
             # Add to front if: not visited before and no obstacle.
             new_pos = (new_x, new_y)
+            # If visited is 0 and obstacles is not 255 (both at new_pos), then:
+            # append the tuple (cost + deltacost, new_pos) to the front.
+            if(not visited[new_pos] and obstacles[new_pos] != 255):
+                front.append((cost + deltacost, new_pos))
 
     return ([], visited)
 

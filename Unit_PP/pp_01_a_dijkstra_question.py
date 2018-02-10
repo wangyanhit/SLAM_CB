@@ -78,34 +78,42 @@ def dijkstra(start, goal, obstacles):
     # While there are elements to investigate in our front.
     while front:
         # Get smallest item and remove it from front.
-        # CHANGE 01_a:
         # - Get smallest element from 'front'. Hint: min() may be useful.
+        min_cost_node = min(front)
         # - Remove this element from 'front'. Hint: 'front' is a list.
+        front.remove(min_cost_node)
 
-        # Check if this has been visited already.
-        cost, pos = element  # Change if you named 'element' differently.
-        # CHANGE 01_a: Skip the rest of the loop body if visited[pos] is > 0.
+        # Check if this has been visited already. Skip the rest of the loop body if visited[pos] is > 0.
+        cost, pos = min_cost_node
+        if(visited[pos] > 0):
+            continue
 
         # Now it is visited. Mark with 1.
-        # CHANGE 01_a: Set visited[pos] to 1.
+        visited[pos] = 1
 
         # Check if the goal has been reached.
         if pos == goal:
             break  # Finished!
 
+        new_x = None
+        new_y = None
         # Check all neighbors.
         for dx, dy, deltacost in movements:
             # Determine new position and check bounds.
-            # CHANGE 01_a:
             # - Compute new_x and new_y from old position 'pos' and dx, dy.
+            new_x = pos[0] + dx
+            new_y = pos[1] + dy
             # - Check that new_x is >= 0 and < extents[0], similarly for new_y.
             # - If not, skip the remaining part of this loop.
+            if(new_x < 0 or new_x >= extents[0] or new_y < 0 or new_y >= extents[1]):
+                continue
 
             # Add to front if: not visited before and no obstacle.
             new_pos = (new_x, new_y)
-            # CHANGE 01_a:
             # If visited is 0 and obstacles is not 255 (both at new_pos), then:
             # append the tuple (cost + deltacost, new_pos) to the front.
+            if(not visited[new_pos] and obstacles[new_pos] != 255):
+                front.append((cost + deltacost, new_pos))
 
     return ([], visited)
 

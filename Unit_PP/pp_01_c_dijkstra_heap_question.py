@@ -72,28 +72,43 @@ def dijkstra(start, goal, obstacles):
 
     # While there are elements to investigate in our front.
     while front:
-        # Get smallest item and remove from front.
-        # CHANGE 01_c: replace the minimum search and removal of element
-        #   by a single call to heappop()
+        # Get smallest item from front and remove it from front.
+        min_cost_node = heappop(front)
 
-        # Check if this has been visited already.
-        cost, pos = element
+        # Check if this has been visited already. Skip the rest of the loop body if visited[pos] is > 0.
+        cost, pos = min_cost_node
+        if(visited[pos] > 0):
+            continue
 
-        # Now it is visited. Mark with cost.
+        # Now it is visited. Mark with the cost.
+        visited[pos] = cost
 
         # Check if the goal has been reached.
         if pos == goal:
             break  # Finished!
 
+        new_x = None
+        new_y = None
+
         # Check all neighbors.
         for dx, dy, deltacost in movements:
             # Determine new position and check bounds.
+            # - Compute new_x and new_y from old position 'pos' and dx, dy.
+            new_x = pos[0] + dx
+            new_y = pos[1] + dy
+            # - Check that new_x is >= 0 and < extents[0], similarly for new_y.
+            # - If not, skip the remaining part of this loop.
+            if(new_x < 0 or new_x >= extents[0] or new_y < 0 or new_y >= extents[1]):
+                continue
 
             # Add to front if: not visited before and no obstacle.
             new_pos = (new_x, new_y)
-            # CHANGE 01_c: instead of calling append() on the list, use
-            #   heappush(). This will move the new tuple to the correct
-            #   location in the heap.
+            # If visited is 0 and obstacles is not 255 (both at new_pos), then:
+            # append the tuple (cost + deltacost, new_pos) to the front.
+            if(not visited[new_pos] and obstacles[new_pos] != 255):
+                # Use heappush(). This will move the new tuple to the correct
+                # location in the heap.
+                heappush(front, (cost+deltacost, new_pos))
 
     return ([], visited)
 

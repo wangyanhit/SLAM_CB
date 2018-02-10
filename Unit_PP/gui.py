@@ -1,7 +1,8 @@
 # Tkinter GUI used for playing with path planning algorithms.
 # Author: Claus Brenner, 14 JAN 2014
 from Tkinter import *
-import Image, ImageTk
+import PIL.Image as Image
+import PIL.ImageTk as ImageTk
 import numpy as np
 from math import sin, cos, atan2
 
@@ -19,7 +20,6 @@ class GUI():
                  extra_buttons = None, start_goal_mode = None,
                  window_title = "Path Planning"):
         """Initializes the GUI stuff: canvas and buttons.
-
            Understands the following callbacks:
            'button_1_press', 'button_1_drag', 'button_1_release',
            'shift_button_1_press', 'shift_button_1_drag',
@@ -32,7 +32,7 @@ class GUI():
            points only), or 'oriented' (shows point and orientation)."""
         # Set error handler.
         Tk.report_callback_exception = show_error
-        
+
         # Setup GUI elements.
         self.world_extents = world_extents
         self.display_factor = display_factor
@@ -116,7 +116,7 @@ class GUI():
                     (self.extents[1]-coord[1]-1) / self.display_factor)
         else:
             return None
-        
+
     def to_display(self, coord):
         """Transform display coordinates to world."""
         if coord:
@@ -242,7 +242,7 @@ class GUI():
         self.place_start_goal(0, pos)
     def drag_start(self, pos):
         self.drag_start_goal(0, pos)
-        
+
     def place_goal(self, pos):
         self.place_start_goal(1, pos)
     def drag_goal(self, pos):
@@ -291,4 +291,3 @@ class GUI():
 
         # Make sure drawing order is correct.
         self.set_display_order()
-

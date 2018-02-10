@@ -31,13 +31,19 @@ def draw_background(gui, obstacle_array, visited_array, path,
     # Blue shows obstacle values from 0..254.
     # If red is 0 and 255 only, blue will be all zero.
     blue = obstacle_array - red
-    if not show_visited or visited_array == None:
+    print "visited array", visited_array
+    if not show_visited or visited_array is None:
+        print "no visited"
         green = np.zeros(obstacle_array.shape, dtype=np.uint8)
     else:
+
         max_dist = np.amax(visited_array)
+        print "max distance", max_dist
         if max_dist > 0:
             green = np.uint8(visited_array * (255.0 / max_dist))
+            print "green max > 0"
         else:
             green = np.zeros(obstacle_array.shape, dtype=np.uint8)
+    print "green", green
     gui.set_background(np.dstack((red.T, green.T, blue.T)), color=True)
     gui.set_path(path)
